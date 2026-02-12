@@ -1,110 +1,107 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import emailjs from "@emailjs/browser";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Contact = () => {
   const form = useRef();
-  const [isSent, setIsSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
-  const sendEmail = (e) => {
+  // Initialize EmailJS
+  useEffect(() => {
+    // 1. Double check this key in EmailJS Dashboard > Account > Public Key
+    emailjs.init("Rz7W9pVF0HdDryNNL"); 
+  }, []);
+
+  const sendEmail = async (e) => {
     e.preventDefault();
+    setIsSending(true);
 
-    emailjs
-      .sendForm(
-        "service_axbtt7a",  // Replace with your EmailJS Service ID
-        "template_1ziboq3",  // Replace with your EmailJS Template ID
-        form.current,
-        "Rz7W9pVF0HdDryNNL"  // Replace with your EmailJS Public Key
-      )
-      .then(
-        () => {
-          setIsSent(true);
-          form.current.reset(); // Reset form fields after sending
-          toast.success("Message sent successfully! ✅", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            theme: "dark",
-          });
-        },
-        (error) => {
-          console.error("Error sending message:", error);
-          toast.error("Failed to send message. Please try again.", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            theme: "dark",
-          });
-        }
+    try {
+      const result = await emailjs.sendForm(
+        "service_axbtt7a",   // 2. Check Service ID
+        "template_1ziboq3",  // 3. Check Template ID
+        form.current
       );
+
+      console.log("SUCCESS!", result.status, result.text);
+      form.current.reset();
+      toast.success("Message sent successfully! 🚀", {
+        theme: "dark",
+      });
+    } catch (error) {
+      // This will print the EXACT reason for failure in your browser console (F12)
+      console.error("FAILED...", error);
+      toast.error(`Failed: ${error.text || "Check console for details"}`, {
+        theme: "dark",
+      });
+    }
+
+    setIsSending(false);
   };
 
   return (
-    <section
-      id="contact"
-      className="flex flex-col items-center justify-center py-24 px-[12vw] md:px-[7vw] lg:px-[20vw]"
-    >
-      {/* Toast Container */}
+    <section id="contact" className="py-24 px-[5vw] flex flex-col items-center">
       <ToastContainer />
-
-      {/* Section Title */}
-      <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold text-white">CONTACT</h2>
-        <div className="w-32 h-1 bg-purple-500 mx-auto mt-4"></div>
-        <p className="text-gray-400 mt-4 text-lg font-semibold">
-          I’d love to hear from you—reach out for any opportunities or questions!
-        </p>
+      
+      <div className="text-center mb-12">
+        <h2 className="text-4xl font-bold text-white">Get In Touch</h2>
+        <div className="w-20 h-1 bg-purple-500 mx-auto mt-4"></div>
       </div>
 
-      {/* Contact Form */}
-      <div className="mt-8 w-full max-w-md bg-[#0d081f] p-6 rounded-lg shadow-lg border border-gray-700">
-        <h3 className="text-xl font-semibold text-white text-center">
-          Connect With Me <span className="ml-1">🚀</span>
-        </h3>
+      <div className="w-full max-w-lg bg-[#0d081f] p-8 rounded-2xl border border-gray-800 shadow-2xl">
+        <form ref={form} onSubmit={sendEmail} className="flex flex-col space-y-5">
+          {/* IMPORTANT: "name" attributes must match your EmailJS Template {{tags}} */}
+          <div>
+            <label className="text-gray-400 text-sm mb-2 block">Name</label>
+            <input
+              type="text"
+              name="from_name" 
+              placeholder="John Doe"
+              required
+              className="w-full p-3 rounded-lg bg-[#131025] text-white border border-gray-700 focus:border-purple-500 outline-none transition"
+            />
+          </div>
 
-        <form ref={form} onSubmit={sendEmail} className="mt-4 flex flex-col space-y-4">
-          <input
-            type="email"
-            name="user_email"
-            placeholder="Your Email"
-            required
-            className="w-full p-3 rounded-md bg-[#131025] text-white border border-gray-600 focus:outline-none focus:border-purple-500"
-          />
-          <input
-            type="text"
-            name="user_name"
-            placeholder="Your Name"
-            required
-            className="w-full p-3 rounded-md bg-[#131025] text-white border border-gray-600 focus:outline-none focus:border-purple-500"
-          />
-          <input
-            type="text"
-            name="subject"
-            placeholder="Subject"
-            required
-            className="w-full p-3 rounded-md bg-[#131025] text-white border border-gray-600 focus:outline-none focus:border-purple-500"
-          />
-          <textarea
-            name="message"
-            placeholder="Message"
-            rows="4"
-            required
-            className="w-full p-3 rounded-md bg-[#131025] text-white border border-gray-600 focus:outline-none focus:border-purple-500"
-          />
-          
-          {/* Send Button */}
+          <div>
+            <label className="text-gray-400 text-sm mb-2 block">Email</label>
+            <input
+              type="email"
+              name="reply_to"
+              placeholder="john@example.com"
+              required
+              className="w-full p-3 rounded-lg bg-[#131025] text-white border border-gray-700 focus:border-purple-500 outline-none transition"
+            />
+          </div>
+
+          <div>
+            <label className="text-gray-400 text-sm mb-2 block">Subject</label>
+            <input
+              type="text"
+              name="subject"
+              placeholder="Project Inquiry"
+              required
+              className="w-full p-3 rounded-lg bg-[#131025] text-white border border-gray-700 focus:border-purple-500 outline-none transition"
+            />
+          </div>
+
+          <div>
+            <label className="text-gray-400 text-sm mb-2 block">Message</label>
+            <textarea
+              name="message"
+              rows="4"
+              placeholder="How can I help you?"
+              required
+              className="w-full p-3 rounded-lg bg-[#131025] text-white border border-gray-700 focus:border-purple-500 outline-none transition"
+            />
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-500 py-3 text-white font-semibold rounded-md hover:opacity-90 transition"
+            disabled={isSending}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-500 py-4 text-white font-bold rounded-lg hover:opacity-90 transition transform active:scale-95 disabled:opacity-50"
           >
-            Send
+            {isSending ? "Sending..." : "Send Message"}
           </button>
         </form>
       </div>

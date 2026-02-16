@@ -4,7 +4,8 @@ A sleek, responsive, and fully customizable **animated portfolio website** built
 
 ## 🚀 Live Demo
 
-🔗 [View Portfolio Live]([https://portfolio-of-prajwal-nrrnbasp2-sparky-7d8f2c13.vercel.app/])
+🔗[![Portfolio](https://img.shields.io)](https://portfolio-of-prajwal-nrrnbasp2-sparky-7d8f2c13.vercel.app/)
+
 
 ## 🛠️ Tech Stack
 
